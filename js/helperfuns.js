@@ -1,0 +1,1 @@
+export const arrayVazio = (Arr) => !Array.isArray(Arr) || Arr.length <= 0;

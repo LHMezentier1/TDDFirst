@@ -1,55 +1,50 @@
-const {adicionarLivro, encontrarLivro, listarNaoLido, encontrarLivroPorId} = require("../js/livros")
+import Livro from '../js/livro';
 
-const livros = [
-{
-id: 1,
-titulo: "JavaScript",
-autor: "Autor A",
-genero: "Programação",
-paginas: 300,
-lido: false
-},
-{
-id: 2,
-titulo: "HTML e CSS",
-autor: "Autor B",
-genero: "Web",
-paginas: 250,
-lido: true
-}]; 
+const books = [new Livro(1, "JavaScript", "Autor A", "Programação", 300, false), new Livro(2, "HTML e CSS", "Autor B", "Web", 250, true)]
 
 test("if we add a book, pos 0 on it should be the book we added", () => {
-    const livro = {
-        id: 3,
-        titulo: "A Arte de Dormir",
-        autor: "ZéDosDormes",
-        genero: "Vida",
-        paginas: 300,
-        lido: false
-    }
-    const resultado = adicionarLivro(livros, livro);
-    expect(resultado).toHaveLength(livros.length+1);
-    expect(resultado[0]).toEqual(livro);
+    const book = new Livro(3, "A Arte de Dormir", "ZéDosDormes", "Vida", 300, false);
+    const result = book.add(books);
+    expect(result).toHaveLength(books.length+1);
+    expect(result[0]).toEqual(book);
 });
 test("if we try to find a book that exists, it should return an array with all the books with that name", ()=>{
-    const livro = {id: 1,titulo: "JavaScript",autor: "Autor A",genero: "Programação",paginas: 300,lido: false}
-    const resultado = encontrarLivro(livros, "javascript")
-    expect(resultado[0]).toEqual(livro)
+    const result = Livro.getLivro(books, "javascript")
+    expect(result[0].genero).toBe("Programação")
 })
 test("If we try to find a book that doesn't exist, it should return null", ()=>{
-    const resultado = encontrarLivro(livros, "a")
-    expect(resultado).toEqual(null)
+    const result = Livro.getLivro(books, "a")
+    expect(result).toEqual(null)
 })
 test("If we try to find a book that exists by it's id, it should return that book exclusively, not in an array.", ()=>{
-    const livro = {id: 1,titulo: "JavaScript",autor: "Autor A",genero: "Programação",paginas: 300,lido: false}
-    const resultado = encontrarLivroPorId(livros, 1)
-    expect(resultado).toEqual(livro)
+    const result = Livro.getLivroById(books, 1)
+    expect(result.id).toEqual(1)
 })
 test("If we try to find a book that doesn't exist by it's id, it should return null", ()=>{
-    const resultado = encontrarLivroPorId(livros, 9)
-    expect(resultado).toEqual(null)
+    const result = Livro.getLivroById(books, 9)
+    expect(result).toEqual(null)
 })
 test("if we try to pass something that isn't an array to any function, it should return null", () =>{
-    const resultado = [adicionarLivro(1, 3), encontrarLivro(1, "a"), listarNaoLido(1), encontrarLivroPorId(1, 7)]
-    expect(resultado.every(e => e == null)).toEqual(true)
+    const book = new Livro(3, "A Arte de Dormir", "ZéDosDormes", "Vida", 300, false);
+    const result = [book.add(1, 3), Livro.getLivro(1, "a"), Livro.getNotRead(1), Livro.getLivroById(1, 7), Livro.markAsReadById(1, 4)]
+    expect(result.every(e => e == null)).toEqual(true)
+})
+test("If we mark a book that exists as read, it should be returned as read.", () =>{
+    const result = Livro.markAsReadById(books, 1);
+    console.log(result)
+    expect(Livro.getLivroById(result, 1).lido).toEqual(true)
+})
+test("If we try to mark a book that doesn't exist as read, it should return null.", () =>{
+    const result = Livro.markAsReadById(books, 4);
+    expect(result).toEqual(null)
+})
+test("If we try to find books by a substring which exists in one of the books, all the books returned must have the substring in it.", () =>{
+    const substring = "ava";
+    const result = Livro.getLivroThatIncludes(books, substring);
+    expect(result.every(e => e.titulo.toLowerCase().includes(substring))).toEqual(true)
+})
+test("If we try to find books by a substring that none of them have, null should be returned.", () =>{
+    const substring = "iadagdaufhj";
+    const result = Livro.getLivroThatIncludes(books, substring);
+    expect(result).toEqual(null)
 })
