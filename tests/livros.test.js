@@ -31,7 +31,6 @@ test("if we try to pass something that isn't an array to any function, it should
 })
 test("If we mark a book that exists as read, it should be returned as read.", () =>{
     const result = Livro.markAsReadById(books, 1);
-    console.log(result)
     expect(Livro.getLivroById(result, 1).lido).toEqual(true)
 })
 test("If we try to mark a book that doesn't exist as read, it should return null.", () =>{
@@ -47,4 +46,12 @@ test("If we try to find books by a substring that none of them have, null should
     const substring = "iadagdaufhj";
     const result = Livro.getLivroThatIncludes(books, substring);
     expect(result).toEqual(null)
+})
+test("If we add the books to localstorage, we should get them back with loadBooks", () =>{
+    const result = Livro.saveBooks(books)
+    expect(Livro.getBooks()).toEqual(books)
+})
+test("getNextId should give us the next available id", () =>{
+    const id = Livro.getNextId(books)
+    expect(id).toEqual(3)
 })

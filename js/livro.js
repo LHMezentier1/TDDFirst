@@ -1,3 +1,5 @@
+import status from "./status";
+
 const {arrayVazio} = require("./helperfuns");
 export default class Livro{
     /**
@@ -8,7 +10,7 @@ export default class Livro{
      * @param {int} paginas 
      * @param {boolean} lido 
      */
-    constructor(id, titulo, autor, genero, paginas, lido){
+    constructor(id, titulo, autor, genero, paginas, lido = false){
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
@@ -57,6 +59,47 @@ export default class Livro{
         if(!target) return null;
         target.lido = true;
         return livros;
+    }
+
+    static statistics = class {
+        constructor(total, read, unread, totalpag){
+            this.total = total
+            this.read = read
+            this.unread = unread
+            this.totalpag = totalpag
+        }
+        static getStatistics(livros){
+            if(!Array.isArray(livros)) return null
+            const total = livros.length
+            const read = livros.reduce((sum, e) => e.lido ? sum + 1 : sum, 0)
+            const unread = livros.reduce((sum, e) => !e.lido ? sum + 1 : sum, 0)
+            const pages = livros.reduce((sum, e) => Number.isInteger(e.paginas) ? sum += e.paginas : sum, 0)
+            return new Livro.statistics(total, read, unread, pages)
+        }
+    }
+
+    static saveBooks(livros){
+        if(!Array.isArray(livros)) return new status(false, "Mande algo que seja um array!")
+        localStorage.setItem("livros", JSON.stringify(livros))
+        return new status(true, "Adicionado ao local storage!")
+    }
+    static getBooks(){
+        if(!localStorage.hasOwnProperty("livros")) return []
+        const ret = JSON.parse(localStorage.getItem("livros"))
+        if(!ret) return []
+        return ret
+    }
+    static allBooksRead(livros){
+        if(!Array.isArray(livros)) return false
+        if(livros.any(e => !e.lido)) return false;
+        return true
+    }
+    static getNextId(livros){
+        console.log(livros)
+        if(arrayVazio(livros)) return 1;
+        let nextId = 1;
+        livros.forEach(e => e.id >= nextId ? nextId = e.id+1 : nextId = nextId)
+        return nextId
     }
 
 }
