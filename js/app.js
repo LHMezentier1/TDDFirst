@@ -1,14 +1,18 @@
-import Livro from "./livro"
+import Livro from "./livro.js"
 
-let livros = Livro.getBooks()
+let allLivros = Livro.getBooks()
 
 const form1 = document.querySelector("#formLivro")
 const st = document.querySelector("#estatisticas")
 const listaLivros = document.querySelector("#listaLivros")
+const pesquisa = document.querySelector("#pesquisa")
+
+let currentBooks = allLivros
+let isOnSearch = false
 
 function reloadBooks(){
     listaLivros.innerHTML = ''
-    livros.forEach(e =>{
+    currentBooks.forEach(e =>{
         const div = document.createElement('div')
         const titulo = e.titulo
         const autor = e.autor
@@ -25,11 +29,11 @@ function reloadBooks(){
         div.append(h1t, h1a, h1p, h1g)
         listaLivros.appendChild(div)
     })
-}
+} reloadBooks()
 
 function reloadStatistics(){
     st.innerHTML = ''
-    const statistics = Livro.statistics.getStatistics(livros)
+    const statistics = Livro.statistics.getStatistics(currentBooks)
     const h1t = document.createElement('h1')
     const h1r = document.createElement('h1')
     const h1ur = document.createElement('h1')
@@ -39,20 +43,36 @@ function reloadStatistics(){
     h1ur.innerText = `Livros nao lidos: ${statistics.unread}`
     h1tp.innerText = `Total de paginas: ${statistics.totalpag}`
     st.append(h1t, h1r, h1ur, h1tp)
-}
+} reloadStatistics()
 
-form1.addEventListener("subimit", (event) => {
-    const formData = new FormData(event.target)
-    const form = Object.fromEntries(formData.entries())
-    const titulo = form.titulo
-    const genero = form.genero
-    const autor = form.autor
-    const paginas = form.paginas
-    const livro = new Livro(Livro.getNextId(livros), titulo, autor, genero, paginas)
-    livros = livro.add(livros)
-    Livro.saveBooks(livros)
+form1.addEventListener("submit", (event) => {
+  event.preventDefault(); 
+  const formData = new FormData(event.target);
+  const form = Object.fromEntries(formData.entries());
+  const titulo = form.titulo;
+  const genero = form.genero;
+  const autor = form.autor;
+  const paginas = parseInt(form.paginas, 10) || 0;
+  const livro = new Livro(Livro.getNextId(allLivros), titulo, autor, genero, paginas);
+  allLivros = livro.add(allLivros);
+  Livro.saveBooks(allLivros);
+  if(!isOnSearch) currentBooks = allLivros
+  reloadBooks();
+  reloadStatistics();
+  form1.reset();
+});
+pesquisa.addEventListener('input', () =>{
+    console.log('a')
+    if(pesquisa.value.trim() === ''){
+        currentBooks = allLivros
+        isOnSearch = false
+        reloadBooks()
+        reloadStatistics()
+        return
+    }
+    isOnSearch = true
+    currentBooks = Livro.getLivroThatIncludes(allLivros, pesquisa.value)
+    console.log(currentBooks)
     reloadBooks()
     reloadStatistics()
 })
-reloadBooks()
-reloadStatistics()

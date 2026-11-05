@@ -1,6 +1,6 @@
-import status from "./status";
+import status from "./status.js";
 
-const {arrayVazio} = require("./helperfuns");
+import { arrayVazio } from "./helperfuns.js";
 export default class Livro{
     /**
      * @param {int} id 

@@ -1,7 +1,7 @@
-import Livro from './livro'
-import Usuario from './usuario'
-import { arrayVazio } from './helperfuns';
-import status from './status';
+import Livro from './livro.js'
+import Usuario from './usuario.js'
+import { arrayVazio } from './helperfuns.js';
+import status from './status.js';
 
 export default class Emprestimo{
     /**

@@ -1,4 +1,4 @@
-import status from "./status"
+import status from "./status.js"
 export default class Usuario{
     /**
      * 
